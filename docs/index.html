@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Assessment Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🧠 Mental Health Assessment</h1>
+                <p class="subtitle">AI-Powered Early Detection for Anxiety & Depression</p>
+                <p style="margin-top: 10px; font-size: 0.95rem; opacity: 0.9;">Leveraging Machine Learning for Data-Driven Mental Health Screening</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="info-box">
+                <p><strong>How This Works: Population-Level Risk Assessment</strong></p>
+                <p>This tool uses machine learning trained on CDC population health data to estimate the <strong>prevalence of anxiety/depression symptoms</strong> among people with similar demographics to you. The model analyzes patterns across demographic groups to predict what percentage of people with your characteristics typically experience these symptoms.</p>
+                
+                <p style="margin-top: 12px;"><strong>What You'll Get:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 8px; margin-bottom: 12px;">
+                    <li>📊 <strong>Prevalence Rate:</strong> Percentage of people in your demographic group experiencing symptoms</li>
+                    <li>🎯 <strong>Risk Category:</strong> Whether your demographic group is low, moderate, or high risk</li>
+                    <li>💡 <strong>Context:</strong> How your demographic factors correlate with mental health patterns</li>
+                    <li>📞 <strong>Resources:</strong> Mental health support information for early intervention</li>
+                </ul>
+                
+                <p class="disclaimer"><strong>Important:</strong> This tool predicts population-level statistics, NOT individual diagnosis. The percentage shows how common these symptoms are in your demographic group. If you're experiencing symptoms, please consult a mental health professional regardless of the prediction.</p>
+            </div>
+
+            <div class="model-explanation-box">
+                <h3>🤖 How the Model Calculates the Percentage</h3>
+                <div class="calculation-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <strong>Input Collection</strong>
+                            <p>The model takes your demographic information: age group, sex, race/ethnicity, education, state, and assessment type.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <strong>Feature Encoding</strong>
+                            <p>Your inputs are converted into numerical features (one-hot encoding) that the machine learning algorithm can process.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <strong>Pattern Matching</strong>
+                            <p>The trained model analyzes patterns learned from CDC's National Health Interview Survey data covering millions of responses.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <strong>Prevalence Prediction</strong>
+                            <p>The model outputs a percentage (0-100%) representing the proportion of people in your demographic group who report symptoms.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-details">
+                    <p><strong>📚 Data Source:</strong> CDC National Health Interview Survey (NHIS) - Covers diverse populations across all US states</p>
+                    <p><strong>🎯 Prediction Type:</strong> Regression model predicting population prevalence, not individual diagnosis</p>
+                    <p><strong>⚙️ Key Parameters:</strong> Age, Sex, Race/Ethnicity, Education, Geography, and Time Period</p>
+                </div>
+            </div>
+
+            <div class="optional-params-info">
+                <h3>📊 Optional Parameters for Maximum Accuracy</h3>
+                <p>The following <strong>3 parameters have major impact</strong> on mental health prevalence (sourced from CDC data):</p>
+                <ul>
+                    <li><strong>♿ Disability Status:</strong> 52.9% (with) vs 18.5% (without) - <span style="color: #ef4444; font-weight: 600;">2.9x difference!</span></li>
+                    <li><strong>🏳️‍⚧️ Gender Identity:</strong> 63.3% (transgender) vs 20-22% (cis-gender) - <span style="color: #ef4444; font-weight: 600;">3x difference!</span></li>
+                    <li><strong>🏳️‍🌈 Sexual Orientation:</strong> 49.8% (bisexual), 31.2% (gay/lesbian) vs 19.7% (straight) - <span style="color: #f59e0b; font-weight: 600;">2.5x difference!</span></li>
+                </ul>
+                <p style="margin-top: 10px;"><em>💡 All optional fields are completely confidential and can be skipped with "Prefer not to answer"</em></p>
+            </div>
+
+            <form id="assessmentForm">
+                <div class="form-section">
+                    <h2>📋 Personal Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="indicator">Assessment Type</label>
+                        <select id="indicator" name="indicator" required>
+                            <option value="">Select an option...</option>
+                            <option value="Symptoms of Depressive Disorder">Symptoms of Depressive Disorder</option>
+                            <option value="Symptoms of Anxiety Disorder">Symptoms of Anxiety Disorder</option>
+                            <option value="Symptoms of Anxiety Disorder or Depressive Disorder">Symptoms of Anxiety or Depressive Disorder</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age_group">Age Group</label>
+                        <select id="age_group" name="age_group" required>
+                            <option value="">Select your age group...</option>
+                            <option value="18 - 29 years">18 - 29 years</option>
+                            <option value="30 - 39 years">30 - 39 years</option>
+                            <option value="40 - 49 years">40 - 49 years</option>
+                            <option value="50 - 59 years">50 - 59 years</option>
+                            <option value="60 - 69 years">60 - 69 years</option>
+                            <option value="70 - 79 years">70 - 79 years</option>
+                            <option value="80 years and above">80 years and above</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select your sex...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="race_ethnicity">Race/Ethnicity</label>
+                        <select id="race_ethnicity" name="race_ethnicity" required>
+                            <option value="">Select your race/ethnicity...</option>
+                            <option value="Hispanic or Latino">Hispanic or Latino</option>
+                            <option value="Non-Hispanic White, single race">Non-Hispanic White</option>
+                            <option value="Non-Hispanic Black, single race">Non-Hispanic Black</option>
+                            <option value="Non-Hispanic Asian, single race">Non-Hispanic Asian</option>
+                            <option value="Non-Hispanic, other races and multiple races">Other/Multiple Races</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="education">Education Level</label>
+                        <select id="education" name="education" required>
+                            <option value="">Select your education level...</option>
+                            <option value="Less than a high school diploma">Less than High School</option>
+                            <option value="High school diploma or GED">High School Diploma or GED</option>
+                            <option value="Some college/Associate's degree">Some College or Associate's Degree</option>
+                            <option value="Bachelor's degree or higher">Bachelor's Degree or Higher</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="disability">Disability Status (Optional - Significantly Impacts Results)</label>
+                        <select id="disability" name="disability">
+                            <option value="">Prefer not to answer</option>
+                            <option value="With disability">With disability</option>
+                            <option value="Without disability">Without disability</option>
+                        </select>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px;">
+                            ⚠️ Major factor: With disability shows 52.9% vs 18.5% without
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender_identity">Gender Identity (Optional - Important Factor)</label>
+                        <select id="gender_identity" name="gender_identity">
+                            <option value="">Prefer not to answer</option>
+                            <option value="Cis-gender male">Cis-gender Male</option>
+                            <option value="Cis-gender female">Cis-gender Female</option>
+                            <option value="Transgender">Transgender</option>
+                        </select>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px;">
+                            ⚠️ Major factor: Transgender shows 63.3% vs 20-22% cis-gender
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sexual_orientation">Sexual Orientation (Optional - Important Factor)</label>
+                        <select id="sexual_orientation" name="sexual_orientation">
+                            <option value="">Prefer not to answer</option>
+                            <option value="Straight">Straight (Heterosexual)</option>
+                            <option value="Gay or lesbian">Gay or Lesbian</option>
+                            <option value="Bisexual">Bisexual</option>
+                        </select>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px;">
+                            ⚠️ Major factor: Bisexual 49.8%, Gay/Lesbian 31.2% vs Straight 19.7%
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="marital_status">Marital Status (Optional)</label>
+                        <select id="marital_status" name="marital_status">
+                            <option value="">Prefer not to answer</option>
+                            <option value="Married">Married</option>
+                            <option value="Never married">Never Married</option>
+                            <option value="Widowed/Divorced/Separated">Widowed, Divorced, or Separated</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="employment">Employment Status (Optional)</label>
+                        <select id="employment" name="employment">
+                            <option value="">Prefer not to answer</option>
+                            <option value="Employed">Employed</option>
+                            <option value="Unemployed">Unemployed</option>
+                            <option value="Not in workforce">Not in Workforce (Student/Retired/Homemaker)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <select id="state" name="state" required>
+                            <option value="">Select your state...</option>
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California">California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New Mexico">New Mexico</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="North Dakota">North Dakota</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span id="btnText">Get Assessment</span>
+                    <div id="btnLoader" class="loader" style="display: none;"></div>
+                </button>
+            </form>
+
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <h2>Assessment Results</h2>
+                <div id="resultsContent"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 Mental Health Assessment Tool | For educational and screening purposes only</p>
+            <p class="footer-note">If you or someone you know is in crisis, please call the National Suicide Prevention Lifeline at 988</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
