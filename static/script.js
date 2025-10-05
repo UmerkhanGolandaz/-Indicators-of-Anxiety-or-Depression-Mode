@@ -237,6 +237,177 @@ document.addEventListener('DOMContentLoaded', function() {
         animateResultsEntrance();
     }
 
+    // Chatbot functionality
+    class ChatbotManager {
+        constructor() {
+            this.sessionId = null;
+            this.isOpen = false;
+            this.isTyping = false;
+            this.initializeElements();
+            this.attachEventListeners();
+            this.initializeSession();
+        }
+
+        initializeElements() {
+            this.toggle = document.getElementById('chatbot-toggle');
+            this.container = document.getElementById('chatbot-container');
+            this.close = document.getElementById('chatbot-close');
+            this.messages = document.getElementById('chatbot-messages');
+            this.input = document.getElementById('chatbot-input');
+            this.sendBtn = document.getElementById('chatbot-send');
+            this.typing = document.getElementById('chatbot-typing');
+        }
+
+        attachEventListeners() {
+            this.toggle.addEventListener('click', () => this.toggleChatbot());
+            this.close.addEventListener('click', () => this.closeChatbot());
+            this.sendBtn.addEventListener('click', () => this.sendMessage());
+            this.input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
+
+        async initializeSession() {
+            try {
+                const response = await fetch('/chatbot/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    this.sessionId = data.session_id;
+                }
+            } catch (error) {
+                console.log('Chatbot session initialization failed:', error);
+            }
+        }
+
+        toggleChatbot() {
+            this.isOpen = !this.isOpen;
+            if (this.isOpen) {
+                this.openChatbot();
+            } else {
+                this.closeChatbot();
+            }
+        }
+
+        openChatbot() {
+            this.container.style.display = 'flex';
+            this.input.focus();
+            this.isOpen = true;
+        }
+
+        closeChatbot() {
+            this.container.style.display = 'none';
+            this.isOpen = false;
+        }
+
+        async sendMessage() {
+            const message = this.input.value.trim();
+            if (!message || this.isTyping) return;
+
+            // Add user message to chat
+            this.addMessage(message, 'user');
+            this.input.value = '';
+            this.sendBtn.disabled = true;
+
+            // Show typing indicator
+            this.showTyping();
+
+            try {
+                const response = await fetch('/chatbot/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: this.sessionId
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Hide typing indicator
+                this.hideTyping();
+
+                if (data.success) {
+                    // Add bot response
+                    setTimeout(() => {
+                        this.addMessage(data.message, 'bot');
+                    }, 500);
+                    
+                    // Update session ID if provided
+                    if (data.session_id) {
+                        this.sessionId = data.session_id;
+                    }
+                } else {
+                    // Add error message
+                    setTimeout(() => {
+                        this.addMessage("I'm sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Chatbot error:', error);
+                this.hideTyping();
+                setTimeout(() => {
+                    this.addMessage("I'm sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
+                }, 500);
+            } finally {
+                this.sendBtn.disabled = false;
+            }
+        }
+
+        addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${sender}-message`;
+            
+            const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${this.escapeHtml(content)}</p>
+                </div>
+                <div class="message-time">${currentTime}</div>
+            `;
+
+            this.messages.appendChild(messageDiv);
+            this.scrollToBottom();
+        }
+
+        showTyping() {
+            this.isTyping = true;
+            this.typing.style.display = 'flex';
+            this.scrollToBottom();
+        }
+
+        hideTyping() {
+            this.isTyping = false;
+            this.typing.style.display = 'none';
+        }
+
+        scrollToBottom() {
+            setTimeout(() => {
+                this.messages.scrollTop = this.messages.scrollHeight;
+            }, 100);
+        }
+
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+
+    // Initialize chatbot when DOM is loaded
+    window.chatbot = new ChatbotManager();
+
     function displayError(message) {
         resultsContent.innerHTML = `
             <div class="error-box">
@@ -732,8 +903,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add validation feedback
         input.addEventListener('input', function() {
             validateField(this);
-        });
     });
+});
     
     // Enhanced form validation
     function validateField(field) {
