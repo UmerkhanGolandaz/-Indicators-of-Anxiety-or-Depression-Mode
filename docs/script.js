@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('assessmentForm');
     const resultsSection = document.getElementById('resultsSection');
     const resultsContent = document.getElementById('resultsContent');
-    const submitBtn = document.querySelector('.submit-btn');
+    const submitBtn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
     const btnLoader = document.getElementById('btnLoader');
 
@@ -172,41 +172,63 @@ document.addEventListener('DOMContentLoaded', function() {
             state: formData.get('state')
         };
 
-        // Simulate processing time
-        setTimeout(() => {
-            // Make prediction
-            const prediction = predictMentalHealthRisk(userInputs);
-            
-            // Determine condition name
-            let conditionName, conditionDisplay;
-            if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
-                conditionName = "depression";
-                conditionDisplay = "depressive disorder";
-            } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
-                conditionName = "anxiety";
-                conditionDisplay = "anxiety disorder";
+        // Try to use backend first, fallback to client-side prediction
+        fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userInputs)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Backend prediction successful
+                displayResults(data);
             } else {
-                conditionName = "anxiety or depression";
-                conditionDisplay = "anxiety or depressive disorder";
+                throw new Error('Backend prediction failed');
             }
+        })
+        .catch(error => {
+            console.log('Backend not available, using client-side prediction:', error);
+            
+            // Fallback to client-side prediction
+            setTimeout(() => {
+                // Make prediction
+                const prediction = predictMentalHealthRisk(userInputs);
+                
+                // Determine condition name
+                let conditionName, conditionDisplay;
+                if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
+                    conditionName = "depression";
+                    conditionDisplay = "depressive disorder";
+                } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
+                    conditionName = "anxiety";
+                    conditionDisplay = "anxiety disorder";
+                } else {
+                    conditionName = "anxiety or depression";
+                    conditionDisplay = "anxiety or depressive disorder";
+                }
 
-            const resultData = {
-                prediction: prediction,
-                confidence: 85, // Mock confidence
-                recommendation: getRecommendation(prediction, conditionName),
-                condition_name: conditionName,
-                condition_display: conditionDisplay,
-                user_inputs: userInputs
-            };
+                const resultData = {
+                    prediction: prediction,
+                    confidence: 85, // Mock confidence
+                    recommendation: getRecommendation(prediction, conditionName),
+                    condition_name: conditionName,
+                    condition_display: conditionDisplay,
+                    user_inputs: userInputs
+                };
 
-            // Display results
-            displayResults(resultData);
-
+                // Display results
+                displayResults(resultData);
+            }, 1000);
+        })
+        .finally(() => {
             // Reset button
             btnText.textContent = 'Get Assessment';
             btnLoader.style.display = 'none';
             submitBtn.disabled = false;
-        }, 2000);
+        });
     });
 
     // Chatbot functionality for static version
