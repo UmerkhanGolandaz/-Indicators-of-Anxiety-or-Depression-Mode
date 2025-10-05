@@ -1,370 +1,377 @@
-// Mental Health Assessment - Client-Side Prediction Model
-// Based on CDC NHIS data patterns
-
+// Static version for GitHub Pages - Client-side prediction logic
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('assessmentForm');
     const resultsSection = document.getElementById('resultsSection');
     const resultsContent = document.getElementById('resultsContent');
+    const submitBtn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
     const btnLoader = document.getElementById('btnLoader');
-    const submitBtn = document.querySelector('.submit-btn');
 
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = {
-            indicator: document.getElementById('indicator').value,
-            age_group: document.getElementById('age_group').value,
-            sex: document.getElementById('sex').value,
-            race_ethnicity: document.getElementById('race_ethnicity').value,
-            education: document.getElementById('education').value,
-            disability: document.getElementById('disability').value,
-            gender_identity: document.getElementById('gender_identity').value,
-            sexual_orientation: document.getElementById('sexual_orientation').value,
-            marital_status: document.getElementById('marital_status').value,
-            employment: document.getElementById('employment').value,
-            state: document.getElementById('state').value
+    // Client-side prediction logic (simplified version)
+    function predictMentalHealthRisk(userInputs) {
+        let riskScore = 15; // Base score
+
+        // Age group adjustments
+        const ageScores = {
+            '18 - 29 years': 25,
+            '30 - 39 years': 23,
+            '40 - 49 years': 20,
+            '50 - 59 years': 18,
+            '60 - 69 years': 16,
+            '70 - 79 years': 14,
+            '80 years and above': 12
         };
+        riskScore = ageScores[userInputs.age_group] || riskScore;
 
-        // Show loading state
-        btnText.style.display = 'none';
-        btnLoader.style.display = 'block';
-        submitBtn.disabled = true;
-
-        // Simulate processing delay for better UX
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        try {
-            const prediction = calculatePrediction(formData);
-            displayResults(prediction);
-            resultsSection.style.display = 'block';
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (error) {
-            displayError('An error occurred while processing your request. Please try again.');
-        } finally {
-            // Reset button state
-            btnText.style.display = 'inline';
-            btnLoader.style.display = 'none';
-            submitBtn.disabled = false;
-        }
-    });
-
-    function calculatePrediction(data) {
-        // Base prevalence rates from CDC data (national averages)
-        let baseRate = 22.5; // Overall US population average for anxiety/depression
-        
-        // Indicator type adjustment
-        if (data.indicator === "Symptoms of Anxiety Disorder") {
-            baseRate = 21.3;
-        } else if (data.indicator === "Symptoms of Depressive Disorder") {
-            baseRate = 18.2;
-        } else if (data.indicator === "Symptoms of Anxiety Disorder or Depressive Disorder") {
-            baseRate = 27.5;
+        // Sex adjustments
+        if (userInputs.sex === 'Female') {
+            riskScore += 3;
         }
 
-        // Age group factors (younger = higher rates)
-        const ageFactors = {
-            "18 - 29 years": 1.35,
-            "30 - 39 years": 1.20,
-            "40 - 49 years": 1.10,
-            "50 - 59 years": 1.05,
-            "60 - 69 years": 0.85,
-            "70 - 79 years": 0.70,
-            "80 years and above": 0.60
+        // Race/ethnicity adjustments
+        const raceScores = {
+            'Non-Hispanic White, single race': 0,
+            'Non-Hispanic Black, single race': 2,
+            'Hispanic or Latino': 1,
+            'Non-Hispanic Asian, single race': -2,
+            'Non-Hispanic, other races and multiple races': 1
         };
-        baseRate *= (ageFactors[data.age_group] || 1.0);
+        riskScore += raceScores[userInputs.race_ethnicity] || 0;
 
-        // Sex factors (females slightly higher)
-        if (data.sex === "Female") {
-            baseRate *= 1.15;
-        } else if (data.sex === "Male") {
-            baseRate *= 0.85;
-        }
-
-        // Race/Ethnicity factors
-        const raceFactors = {
-            "Hispanic or Latino": 1.05,
-            "Non-Hispanic White, single race": 1.0,
-            "Non-Hispanic Black, single race": 1.08,
-            "Non-Hispanic Asian, single race": 0.75,
-            "Non-Hispanic, other races and multiple races": 1.25
+        // Education adjustments
+        const educationScores = {
+            'Less than a high school diploma': 4,
+            'High school diploma or GED': 2,
+            'Some college/Associate\'s degree': 1,
+            'Bachelor\'s degree or higher': 0
         };
-        baseRate *= (raceFactors[data.race_ethnicity] || 1.0);
+        riskScore += educationScores[userInputs.education] || 0;
 
-        // Education factors (lower education = higher rates)
-        const educationFactors = {
-            "Less than a high school diploma": 1.30,
-            "High school diploma or GED": 1.15,
-            "Some college/Associate's degree": 1.10,
-            "Bachelor's degree or higher": 0.80
-        };
-        baseRate *= (educationFactors[data.education] || 1.0);
-
-        // MAJOR FACTORS (have significant impact)
-        
-        // Disability status (MAJOR FACTOR)
-        if (data.disability === "With disability") {
-            baseRate *= 2.4; // 52.9% vs 18.5% = 2.86x increase
-        } else if (data.disability === "Without disability") {
-            baseRate *= 0.82;
+        // Optional parameters with major impact
+        if (userInputs.disability === 'With disability') {
+            riskScore += 15;
+        } else if (userInputs.disability === 'Without disability') {
+            riskScore -= 5;
         }
 
-        // Gender identity (MAJOR FACTOR)
-        if (data.gender_identity === "Transgender") {
-            baseRate *= 2.8; // 63.3% vs 22% = 2.88x increase
-        } else if (data.gender_identity === "Cis-gender female") {
-            baseRate *= 1.0;
-        } else if (data.gender_identity === "Cis-gender male") {
-            baseRate *= 0.95;
+        if (userInputs.gender_identity === 'Transgender') {
+            riskScore += 12;
         }
 
-        // Sexual orientation (MAJOR FACTOR)
-        if (data.sexual_orientation === "Bisexual") {
-            baseRate *= 2.2; // 49.8% vs 19.7% = 2.53x increase
-        } else if (data.sexual_orientation === "Gay or lesbian") {
-            baseRate *= 1.4; // 31.2% vs 19.7% = 1.58x increase
-        } else if (data.sexual_orientation === "Straight") {
-            baseRate *= 0.88;
+        if (userInputs.sexual_orientation === 'Bisexual') {
+            riskScore += 8;
+        } else if (userInputs.sexual_orientation === 'Gay or lesbian') {
+            riskScore += 4;
         }
 
         // Marital status
-        const maritalFactors = {
-            "Married": 0.85,
-            "Never married": 1.10,
-            "Widowed/Divorced/Separated": 1.25
-        };
-        if (data.marital_status && maritalFactors[data.marital_status]) {
-            baseRate *= maritalFactors[data.marital_status];
+        if (userInputs.marital_status === 'Widowed/Divorced/Separated') {
+            riskScore += 3;
+        } else if (userInputs.marital_status === 'Never married') {
+            riskScore += 2;
         }
 
-        // Employment status
-        const employmentFactors = {
-            "Employed": 0.90,
-            "Unemployed": 1.35,
-            "Not in workforce": 1.05
-        };
-        if (data.employment && employmentFactors[data.employment]) {
-            baseRate *= employmentFactors[data.employment];
+        // Employment
+        if (userInputs.employment === 'Unemployed') {
+            riskScore += 4;
         }
 
-        // State variations (some states have higher/lower rates)
-        const stateFactors = {
-            "West Virginia": 1.20,
-            "Kentucky": 1.15,
-            "Arkansas": 1.15,
-            "Oklahoma": 1.12,
-            "Tennessee": 1.10,
-            "Alabama": 1.08,
-            "California": 0.95,
-            "Hawaii": 0.85,
-            "Minnesota": 0.90,
-            "Utah": 0.88
-        };
-        if (stateFactors[data.state]) {
-            baseRate *= stateFactors[data.state];
-        }
+        // Ensure score is within reasonable bounds
+        riskScore = Math.max(5, Math.min(45, riskScore));
 
-        // Add slight randomness for realism (±2%)
-        const randomVariation = (Math.random() - 0.5) * 4;
-        baseRate += randomVariation;
+        return riskScore;
+    }
 
-        // Ensure prediction is within realistic bounds
-        baseRate = Math.max(8, Math.min(65, baseRate));
+    function getRiskLevel(score) {
+        if (score < 15) return { level: 'Low', class: 'low', color: '#10b981' };
+        if (score < 25) return { level: 'Moderate', class: 'moderate', color: '#f59e0b' };
+        return { level: 'High', class: 'high', color: '#ef4444' };
+    }
 
-        // Determine risk level
-        let risk_level, risk_class;
-        if (baseRate < 15) {
-            risk_level = "Low";
-            risk_class = "low";
-        } else if (baseRate < 25) {
-            risk_level = "Moderate";
-            risk_class = "moderate";
+    function getRecommendation(score, conditionName) {
+        if (score < 15) {
+            return `Your demographic group shows relatively lower prevalence of ${conditionName} symptoms compared to the general population. However, continue monitoring your mental health and practice good self-care.`;
+        } else if (score < 25) {
+            return `Your demographic group shows moderate prevalence of ${conditionName} symptoms. If you're experiencing any concerning symptoms, we encourage you to speak with a healthcare professional for personalized guidance.`;
         } else {
-            risk_level = "High";
-            risk_class = "high";
+            return `Your demographic group shows higher prevalence of ${conditionName} symptoms. This means a significant portion of people with similar demographics experience these conditions. If you have any symptoms or concerns, we strongly recommend consulting with a mental health professional.`;
         }
-
-        // Determine condition name
-        let condition_name, condition_display;
-        if (data.indicator === "Symptoms of Depressive Disorder") {
-            condition_name = "depression";
-            condition_display = "depressive disorder";
-        } else if (data.indicator === "Symptoms of Anxiety Disorder") {
-            condition_name = "anxiety";
-            condition_display = "anxiety disorder";
-        } else {
-            condition_name = "anxiety or depression";
-            condition_display = "anxiety or depressive disorder";
-        }
-
-        // Generate recommendation
-        let recommendation;
-        if (risk_level === "Low") {
-            recommendation = `Your demographic group shows relatively lower prevalence of ${condition_name} symptoms compared to the general population. However, continue monitoring your mental health and practice good self-care.`;
-        } else if (risk_level === "Moderate") {
-            recommendation = `Your demographic group shows moderate prevalence of ${condition_name} symptoms. If you're experiencing any concerning symptoms, we encourage you to speak with a healthcare professional for personalized guidance.`;
-        } else {
-            recommendation = `Your demographic group shows higher prevalence of ${condition_name} symptoms. This means a significant portion of people with similar demographics experience these conditions. If you have any symptoms or concerns, we strongly recommend consulting with a mental health professional.`;
-        }
-
-        // Simulate confidence (90-98% for models with more data)
-        const confidence = 92 + Math.random() * 6;
-
-        return {
-            success: true,
-            prediction: baseRate,
-            risk_level: risk_level,
-            risk_class: risk_class,
-            confidence: confidence,
-            recommendation: recommendation,
-            condition_name: condition_name,
-            condition_display: condition_display,
-            user_inputs: data
-        };
     }
 
     function displayResults(data) {
-        const userInputs = data.user_inputs || {};
-        const confidenceHTML = data.confidence ? `
-            <div class="confidence-bar">
-                <div class="confidence-label">
-                    <span>Prediction Confidence</span>
-                    <span><strong>${data.confidence.toFixed(1)}%</strong></span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${data.confidence}%"></div>
-                </div>
-            </div>
-        ` : '';
-
-        // Format indicator for display
-        const indicatorDisplay = userInputs.indicator ? userInputs.indicator.replace('Symptoms of ', '') : 'N/A';
-
-        // Build profile items dynamically
-        const profileItems = [
-            { label: '📍 City/State', value: userInputs.state || 'Not specified' },
-            { label: '🎂 Age Group', value: userInputs.age_group || 'N/A' },
-            { label: '⚧ Sex', value: userInputs.sex || 'N/A' },
-            { label: '🌍 Race/Ethnicity', value: userInputs.race_ethnicity || 'N/A' },
-            { label: '🎓 Education', value: userInputs.education || 'N/A' },
-            { label: '♿ Disability', value: userInputs.disability || 'Not provided', highlight: !!userInputs.disability },
-            { label: '🏳️‍⚧️ Gender Identity', value: userInputs.gender_identity || 'Not provided', highlight: !!userInputs.gender_identity },
-            { label: '🏳️‍🌈 Sexual Orientation', value: userInputs.sexual_orientation || 'Not provided', highlight: !!userInputs.sexual_orientation },
-            { label: '💼 Employment', value: userInputs.employment || 'Not provided' },
-            { label: '💑 Marital Status', value: userInputs.marital_status || 'Not provided' },
-            { label: '🔍 Assessment Type', value: indicatorDisplay }
-        ];
-
-        const profileItemsHTML = profileItems.map(item => `
-            <div class="profile-item ${item.highlight ? 'profile-item-highlight' : ''}">
-                <span class="profile-item-label">${item.label}</span>
-                <span class="profile-item-value">${item.value}</span>
-            </div>
-        `).join('');
+        const riskInfo = getRiskLevel(data.prediction);
+        const conditionName = data.condition_name;
+        const conditionDisplay = data.condition_display;
 
         resultsContent.innerHTML = `
-            <div class="user-profile-card">
-                <h3>👤 Your Profile Summary</h3>
-                <div class="profile-grid">
-                    ${profileItemsHTML}
-                </div>
-            </div>
-
             <div class="result-card">
                 <div class="result-header">
-                    <div>
-                        <div style="color: #475569; font-size: 0.9rem; margin-bottom: 5px;">Symptom Prevalence in Your Demographic</div>
-                        <div class="prediction-value" style="color: ${getColorForRisk(data.risk_class)}">
-                            ${data.prediction.toFixed(1)}%
-                        </div>
-                        <div style="color: #475569; font-size: 0.85rem; margin-top: 5px;">of similar individuals report symptoms</div>
-                    </div>
-                    <div class="risk-badge ${data.risk_class}">
-                        ${data.risk_level} Risk
+                    <h3>📊 Assessment Results</h3>
+                    <div class="prediction-value" style="color: ${riskInfo.color}">
+                        ${data.prediction.toFixed(1)}%
                     </div>
                 </div>
                 
-                ${confidenceHTML}
+                <div class="risk-badge ${riskInfo.class}">
+                    ${riskInfo.level} Risk
+                </div>
                 
                 <div class="result-info">
-                    <h3>📊 What This Means</h3>
-                    <p><strong>Population Context:</strong> Based on your demographics (${userInputs.age_group}, ${userInputs.sex}, living in ${userInputs.state}), approximately <strong>${data.prediction.toFixed(1)}%</strong> of people with similar characteristics experience symptoms of ${data.condition_name || 'anxiety or depression'}. This is a ${data.risk_level.toLowerCase()}-risk demographic group.</p>
-                    ${(userInputs.disability || userInputs.gender_identity || userInputs.sexual_orientation || userInputs.employment || userInputs.marital_status) ? `
-                    <p style="margin-top: 12px; padding: 12px; background: #d1fae5; border-left: 4px solid #10b981; border-radius: 8px; font-size: 0.9rem;">
-                        <strong>✨ Enhanced Accuracy:</strong> You provided ${[
-                            userInputs.disability ? '<strong>disability status</strong> (major impact)' : '', 
-                            userInputs.gender_identity ? '<strong>gender identity</strong> (major impact)' : '', 
-                            userInputs.sexual_orientation ? '<strong>sexual orientation</strong> (major impact)' : '',
-                            userInputs.employment ? 'employment status' : '', 
-                            userInputs.marital_status ? 'marital status' : ''
-                        ].filter(Boolean).join(', ')}, which significantly improves prediction precision. These factors have substantial impact on mental health prevalence rates.
-                    </p>` : ''}
-                    <p style="margin-top: 12px;">${data.recommendation}</p>
-                    <p style="margin-top: 12px; padding: 12px; background: #fef3c7; border-radius: 8px; font-size: 0.95rem;">
-                        <strong>⚠️ Remember:</strong> This percentage represents population trends, not a personal diagnosis. If you're experiencing symptoms like persistent sadness, worry, changes in sleep/appetite, or difficulty functioning, please seek professional help regardless of this statistic.
-                    </p>
+                    <p><strong>Assessment Type:</strong> ${data.user_inputs.indicator}</p>
+                    <p><strong>Demographic Group:</strong> ${data.user_inputs.age_group}, ${data.user_inputs.sex}, ${data.user_inputs.race_ethnicity}</p>
+                    <p><strong>Education:</strong> ${data.user_inputs.education}</p>
+                    <p><strong>Location:</strong> ${data.user_inputs.state}</p>
+                    
+                    <div class="recommendation">
+                        <h4>💡 Recommendation</h4>
+                        <p>${data.recommendation}</p>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <p><strong>⚠️ Important:</strong> This assessment provides population-level statistics for your demographic group, not individual diagnosis. If you're experiencing mental health symptoms, please consult with a qualified mental health professional.</p>
+                    </div>
                 </div>
             </div>
-
+            
             <div class="resources-box">
-                <h3>🎯 Next Steps for Early Intervention</h3>
-                <p style="margin-bottom: 15px;">
-                    <strong>Early detection is key to better mental health outcomes.</strong> This data-driven assessment helps identify potential risks early, 
-                    enabling timely intervention and reducing the burden on healthcare systems.
-                </p>
-                
-                <h4 style="margin-top: 15px; margin-bottom: 10px;">📞 Immediate Support Resources:</h4>
+                <h4>🆘 Mental Health Resources</h4>
                 <ul>
-                    <li><strong>National Suicide Prevention Lifeline:</strong> Call or text 988</li>
+                    <li><strong>National Suicide Prevention Lifeline:</strong> 988 (24/7)</li>
                     <li><strong>Crisis Text Line:</strong> Text HOME to 741741</li>
-                    <li><strong>SAMHSA National Helpline:</strong> 1-800-662-4357 (24/7 Treatment Referral)</li>
-                    <li><strong>NAMI Helpline:</strong> 1-800-950-6264 (Mental Health Support)</li>
+                    <li><strong>National Helpline:</strong> 1-800-662-4357</li>
+                    <li><strong>Find a Therapist:</strong> <a href="https://www.psychologytoday.com/us/therapists" target="_blank">Psychology Today</a></li>
                 </ul>
-                
-                <p style="margin-top: 15px; font-size: 0.9rem; padding-top: 15px; border-top: 1px solid #cbd5e1;">
-                    <strong>📋 Clinical Note:</strong> This ML-powered screening tool analyzes population-level patterns to support early detection. 
-                    For accurate diagnosis and personalized treatment planning, please consult with a qualified mental health professional who can 
-                    conduct a comprehensive clinical evaluation.
-                </p>
             </div>
         `;
-    }
 
-    function displayError(message) {
-        resultsContent.innerHTML = `
-            <div class="error-box">
-                <h3>⚠️ Error</h3>
-                <p>${message}</p>
-            </div>
-        `;
         resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function getColorForRisk(riskClass) {
-        switch(riskClass) {
-            case 'low':
-                return '#10b981';
-            case 'moderate':
-                return '#f59e0b';
-            case 'high':
-                return '#ef4444';
-            default:
-                return '#475569';
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        btnText.textContent = 'Analyzing...';
+        btnLoader.style.display = 'inline-block';
+        submitBtn.disabled = true;
+
+        // Collect form data
+        const formData = new FormData(form);
+        const userInputs = {
+            indicator: formData.get('indicator'),
+            age_group: formData.get('age_group'),
+            sex: formData.get('sex'),
+            race_ethnicity: formData.get('race_ethnicity'),
+            education: formData.get('education'),
+            disability: formData.get('disability'),
+            gender_identity: formData.get('gender_identity'),
+            sexual_orientation: formData.get('sexual_orientation'),
+            marital_status: formData.get('marital_status'),
+            employment: formData.get('employment'),
+            state: formData.get('state')
+        };
+
+        // Simulate processing time
+        setTimeout(() => {
+            // Make prediction
+            const prediction = predictMentalHealthRisk(userInputs);
+            
+            // Determine condition name
+            let conditionName, conditionDisplay;
+            if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
+                conditionName = "depression";
+                conditionDisplay = "depressive disorder";
+            } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
+                conditionName = "anxiety";
+                conditionDisplay = "anxiety disorder";
+            } else {
+                conditionName = "anxiety or depression";
+                conditionDisplay = "anxiety or depressive disorder";
+            }
+
+            const resultData = {
+                prediction: prediction,
+                confidence: 85, // Mock confidence
+                recommendation: getRecommendation(prediction, conditionName),
+                condition_name: conditionName,
+                condition_display: conditionDisplay,
+                user_inputs: userInputs
+            };
+
+            // Display results
+            displayResults(resultData);
+
+            // Reset button
+            btnText.textContent = 'Get Assessment';
+            btnLoader.style.display = 'none';
+            submitBtn.disabled = false;
+        }, 2000);
+    });
+
+    // Chatbot functionality for static version
+    class StaticChatbotManager {
+        constructor() {
+            this.sessionId = null;
+            this.isOpen = false;
+            this.isTyping = false;
+            this.initializeElements();
+            this.attachEventListeners();
+            this.initializeSession();
+        }
+
+        initializeElements() {
+            this.toggle = document.getElementById('chatbot-toggle');
+            this.container = document.getElementById('chatbot-container');
+            this.close = document.getElementById('chatbot-close');
+            this.messages = document.getElementById('chatbot-messages');
+            this.input = document.getElementById('chatbot-input');
+            this.sendBtn = document.getElementById('chatbot-send');
+            this.typing = document.getElementById('chatbot-typing');
+        }
+
+        attachEventListeners() {
+            if (this.toggle) {
+                this.toggle.addEventListener('click', () => this.toggleChatbot());
+            }
+            if (this.close) {
+                this.close.addEventListener('click', () => this.closeChatbot());
+            }
+            if (this.sendBtn) {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+            }
+            if (this.input) {
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+            }
+        }
+
+        initializeSession() {
+            this.sessionId = `static_session_${Date.now()}`;
+        }
+
+        toggleChatbot() {
+            this.isOpen = !this.isOpen;
+            if (this.isOpen) {
+                this.openChatbot();
+            } else {
+                this.closeChatbot();
+            }
+        }
+
+        openChatbot() {
+            if (this.container) {
+                this.container.style.display = 'flex';
+                if (this.input) this.input.focus();
+            }
+            this.isOpen = true;
+        }
+
+        closeChatbot() {
+            if (this.container) {
+                this.container.style.display = 'none';
+            }
+            this.isOpen = false;
+        }
+
+        sendMessage() {
+            const message = this.input ? this.input.value.trim() : '';
+            if (!message || this.isTyping) return;
+
+            // Add user message to chat
+            this.addMessage(message, 'user');
+            if (this.input) this.input.value = '';
+            if (this.sendBtn) this.sendBtn.disabled = true;
+
+            // Show typing indicator
+            this.showTyping();
+
+            // Simulate bot response
+            setTimeout(() => {
+                this.hideTyping();
+                const botResponse = this.getBotResponse(message);
+                this.addMessage(botResponse, 'bot');
+                if (this.sendBtn) this.sendBtn.disabled = false;
+            }, 1000 + Math.random() * 1000);
+        }
+
+        getBotResponse(message) {
+            const responses = {
+                'hello': "Hello! I'm your AI mental health assistant. I can help answer questions about mental health, explain assessment results, or provide general support. How can I help you today?",
+                'hi': "Hi there! I'm here to support you with mental health questions. What would you like to know?",
+                'help': "I can help you with:\n• Understanding your assessment results\n• General mental health information\n• Coping strategies\n• When to seek professional help\n• Mental health resources\n\nWhat specific area would you like to explore?",
+                'anxiety': "Anxiety is a normal emotion, but when it becomes persistent and overwhelming, it may indicate an anxiety disorder. Common symptoms include:\n\n• Excessive worry\n• Restlessness\n• Fatigue\n• Difficulty concentrating\n• Irritability\n• Sleep problems\n• Physical symptoms (racing heart, sweating)\n\nIf you're experiencing these symptoms frequently, consider speaking with a mental health professional.",
+                'depression': "Depression is a mood disorder that affects how you feel, think, and handle daily activities. Common symptoms include:\n\n• Persistent sadness or hopelessness\n• Loss of interest in activities\n• Changes in appetite or weight\n• Sleep disturbances\n• Fatigue or low energy\n• Difficulty concentrating\n• Feelings of worthlessness\n\nIf you're experiencing several of these symptoms for two weeks or more, please consider reaching out to a mental health professional.",
+                'stress': "Stress is a natural response to challenges, but chronic stress can impact mental health. Here are some coping strategies:\n\n• Practice deep breathing exercises\n• Engage in regular physical activity\n• Maintain a healthy sleep schedule\n• Practice mindfulness or meditation\n• Connect with supportive people\n• Set realistic goals and priorities\n• Take breaks and practice self-care\n\nRemember, it's okay to seek professional help if stress becomes overwhelming.",
+                'crisis': "If you're in immediate crisis or having thoughts of self-harm, please reach out for help right away:\n\n• National Suicide Prevention Lifeline: 988\n• Crisis Text Line: Text HOME to 741741\n• Emergency Services: 911\n• National Helpline: 1-800-662-4357\n\nYou're not alone, and help is available 24/7.",
+                'thank': "You're welcome! I'm here whenever you need support or have questions about mental health. Remember, seeking help is a sign of strength, not weakness.",
+                'bye': "Take care! Remember that mental health is important, and it's okay to reach out for support when you need it. Have a great day!",
+                'goodbye': "Goodbye! Take care of yourself and remember that seeking help for mental health is always a positive step."
+            };
+            
+            const lowerMessage = message.toLowerCase();
+            for (const [keyword, response] of Object.entries(responses)) {
+                if (lowerMessage.includes(keyword)) {
+                    return response;
+                }
+            }
+            
+            return "I'm here to help with mental health questions. I can assist with information about anxiety, depression, stress, coping strategies, or help you understand your assessment results. What would you like to know more about?";
+        }
+
+        addMessage(content, sender) {
+            if (!this.messages) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${sender}-message`;
+            
+            const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${this.escapeHtml(content)}</p>
+                </div>
+                <div class="message-time">${currentTime}</div>
+            `;
+
+            this.messages.appendChild(messageDiv);
+            this.scrollToBottom();
+        }
+
+        showTyping() {
+            this.isTyping = true;
+            if (this.typing) {
+                this.typing.style.display = 'flex';
+            }
+            this.scrollToBottom();
+        }
+
+        hideTyping() {
+            this.isTyping = false;
+            if (this.typing) {
+                this.typing.style.display = 'none';
+            }
+        }
+
+        scrollToBottom() {
+            if (this.messages) {
+                setTimeout(() => {
+                    this.messages.scrollTop = this.messages.scrollHeight;
+                }, 100);
+            }
+        }
+
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     }
 
-    // Add smooth animations to form inputs
-    const inputs = document.querySelectorAll('select, input');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateX(5px)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'translateX(0)';
-        });
-    });
+    // Initialize static chatbot
+    window.chatbot = new StaticChatbotManager();
 });
-
