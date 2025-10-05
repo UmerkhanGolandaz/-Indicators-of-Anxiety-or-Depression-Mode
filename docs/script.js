@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('assessmentForm');
     const resultsSection = document.getElementById('resultsSection');
     const resultsContent = document.getElementById('resultsContent');
-    const submitBtn = document.getElementById('submitBtn');
+    const submitBtn = document.querySelector('.submit-btn');
     const btnText = document.getElementById('btnText');
     const btnLoader = document.getElementById('btnLoader');
 
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="result-header">
                     <h3>📊 Assessment Results</h3>
                     <div class="prediction-value" style="color: ${riskInfo.color}">
-                        ${data.prediction.toFixed(1)}%
+                            ${data.prediction.toFixed(1)}%
                     </div>
                 </div>
                 
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            
+
             <div class="resources-box">
                 <h4>🆘 Mental Health Resources</h4>
                 <ul>
