@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Assessment Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; }
+        select, input { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:disabled { opacity: 0.6; }
+        #results { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 5px; }
+        .loader { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Mental Health Assessment Test</h1>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="indicator">Assessment Type</label>
+            <select id="indicator" name="indicator" required>
+                <option value="">Select an option...</option>
+                <option value="Symptoms of Depressive Disorder">Symptoms of Depressive Disorder</option>
+                <option value="Symptoms of Anxiety Disorder">Symptoms of Anxiety Disorder</option>
+                <option value="Symptoms of Anxiety Disorder or Depressive Disorder">Symptoms of Anxiety or Depressive Disorder</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="age_group">Age Group</label>
+            <select id="age_group" name="age_group" required>
+                <option value="">Select your age group...</option>
+                <option value="18 - 29 years">18 - 29 years</option>
+                <option value="30 - 39 years">30 - 39 years</option>
+                <option value="40 - 49 years">40 - 49 years</option>
+                <option value="50 - 59 years">50 - 59 years</option>
+                <option value="60 - 69 years">60 - 69 years</option>
+                <option value="70 - 79 years">70 - 79 years</option>
+                <option value="80 years and above">80 years and above</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sex">Sex</label>
+            <select id="sex" name="sex" required>
+                <option value="">Select your sex...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="race_ethnicity">Race/Ethnicity</label>
+            <select id="race_ethnicity" name="race_ethnicity" required>
+                <option value="">Select your race/ethnicity...</option>
+                <option value="Hispanic or Latino">Hispanic or Latino</option>
+                <option value="Non-Hispanic White, single race">Non-Hispanic White</option>
+                <option value="Non-Hispanic Black, single race">Non-Hispanic Black</option>
+                <option value="Non-Hispanic Asian, single race">Non-Hispanic Asian</option>
+                <option value="Non-Hispanic, other races and multiple races">Other/Multiple Races</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="education">Education Level</label>
+            <select id="education" name="education" required>
+                <option value="">Select your education level...</option>
+                <option value="Less than a high school diploma">Less than High School</option>
+                <option value="High school diploma or GED">High School Diploma or GED</option>
+                <option value="Some college/Associate's degree">Some College or Associate's Degree</option>
+                <option value="Bachelor's degree or higher">Bachelor's Degree or Higher</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="state">State</label>
+            <select id="state" name="state" required>
+                <option value="">Select your state...</option>
+                <option value="California">California</option>
+                <option value="Texas">Texas</option>
+                <option value="Florida">Florida</option>
+                <option value="New York">New York</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            <span id="btnText">Get Assessment</span>
+            <div id="btnLoader" class="loader">Loading...</div>
+        </button>
+    </form>
+
+    <div id="results" style="display: none;">
+        <h2>Results</h2>
+        <div id="resultsContent"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded');
+            
+            const form = document.getElementById('testForm');
+            const resultsSection = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            const submitBtn = document.querySelector('.submit-btn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+
+            console.log('Elements found:', { form, submitBtn, btnText, btnLoader });
+
+            // Simple prediction logic
+            function predictMentalHealthRisk(userInputs) {
+                let riskScore = 15; // Base score
+
+                // Age group adjustments
+                const ageScores = {
+                    '18 - 29 years': 25,
+                    '30 - 39 years': 23,
+                    '40 - 49 years': 20,
+                    '50 - 59 years': 18,
+                    '60 - 69 years': 16,
+                    '70 - 79 years': 14,
+                    '80 years and above': 12
+                };
+                riskScore = ageScores[userInputs.age_group] || riskScore;
+
+                // Sex adjustments
+                if (userInputs.sex === 'Female') {
+                    riskScore += 3;
+                }
+
+                // Race/ethnicity adjustments
+                const raceScores = {
+                    'Non-Hispanic White, single race': 0,
+                    'Non-Hispanic Black, single race': 2,
+                    'Hispanic or Latino': 1,
+                    'Non-Hispanic Asian, single race': -2,
+                    'Non-Hispanic, other races and multiple races': 1
+                };
+                riskScore += raceScores[userInputs.race_ethnicity] || 0;
+
+                // Education adjustments
+                const educationScores = {
+                    'Less than a high school diploma': 4,
+                    'High school diploma or GED': 2,
+                    'Some college/Associate\'s degree': 1,
+                    'Bachelor\'s degree or higher': 0
+                };
+                riskScore += educationScores[userInputs.education] || 0;
+
+                // Ensure score is within reasonable bounds
+                riskScore = Math.max(5, Math.min(45, riskScore));
+
+                return riskScore;
+            }
+
+            function getRiskLevel(score) {
+                if (score < 15) return { level: 'Low', class: 'low', color: '#10b981' };
+                if (score < 25) return { level: 'Moderate', class: 'moderate', color: '#f59e0b' };
+                return { level: 'High', class: 'high', color: '#ef4444' };
+            }
+
+            function displayResults(data) {
+                const riskInfo = getRiskLevel(data.prediction);
+                
+                resultsContent.innerHTML = `
+                    <h3>Assessment Results</h3>
+                    <div style="font-size: 2rem; color: ${riskInfo.color}; margin: 20px 0;">
+                        ${data.prediction.toFixed(1)}% - ${riskInfo.level} Risk
+                    </div>
+                    <p><strong>Assessment Type:</strong> ${data.user_inputs.indicator}</p>
+                    <p><strong>Demographics:</strong> ${data.user_inputs.age_group}, ${data.user_inputs.sex}, ${data.user_inputs.race_ethnicity}</p>
+                    <p><strong>Education:</strong> ${data.user_inputs.education}</p>
+                    <p><strong>Location:</strong> ${data.user_inputs.state}</p>
+                    <div style="margin-top: 20px; padding: 15px; background: #e0f2fe; border-radius: 5px;">
+                        <strong>Recommendation:</strong> Based on demographic patterns, your group shows ${riskInfo.level.toLowerCase()} prevalence of mental health symptoms. Continue monitoring your mental health and seek professional help if needed.
+                    </div>
+                `;
+
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            form.addEventListener('submit', function(e) {
+                console.log('Form submitted');
+                e.preventDefault();
+                
+                // Show loading state
+                btnText.textContent = 'Analyzing...';
+                btnLoader.style.display = 'inline-block';
+                submitBtn.disabled = true;
+
+                // Collect form data
+                const formData = new FormData(form);
+                const userInputs = {
+                    indicator: formData.get('indicator'),
+                    age_group: formData.get('age_group'),
+                    sex: formData.get('sex'),
+                    race_ethnicity: formData.get('race_ethnicity'),
+                    education: formData.get('education'),
+                    state: formData.get('state')
+                };
+
+                console.log('User inputs:', userInputs);
+
+                // Simulate processing time
+                setTimeout(() => {
+                    console.log('Processing...');
+                    
+                    // Make prediction
+                    const prediction = predictMentalHealthRisk(userInputs);
+                    console.log('Prediction:', prediction);
+                    
+                    // Determine condition name
+                    let conditionName, conditionDisplay;
+                    if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
+                        conditionName = "depression";
+                        conditionDisplay = "depressive disorder";
+                    } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
+                        conditionName = "anxiety";
+                        conditionDisplay = "anxiety disorder";
+                    } else {
+                        conditionName = "anxiety or depression";
+                        conditionDisplay = "anxiety or depressive disorder";
+                    }
+
+                    const resultData = {
+                        prediction: prediction,
+                        confidence: 85,
+                        condition_name: conditionName,
+                        condition_display: conditionDisplay,
+                        user_inputs: userInputs
+                    };
+
+                    console.log('Result data:', resultData);
+
+                    // Display results
+                    displayResults(resultData);
+
+                    // Reset button
+                    btnText.textContent = 'Get Assessment';
+                    btnLoader.style.display = 'none';
+                    submitBtn.disabled = false;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
