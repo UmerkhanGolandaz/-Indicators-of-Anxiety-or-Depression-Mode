@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="result-header">
                     <h3>📊 Assessment Results</h3>
                     <div class="prediction-value" style="color: ${riskInfo.color}">
-                            ${data.prediction.toFixed(1)}%
+                        ${data.prediction.toFixed(1)}%
                     </div>
                 </div>
                 
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-
+            
             <div class="resources-box">
                 <h4>🆘 Mental Health Resources</h4>
                 <ul>
@@ -172,63 +172,41 @@ document.addEventListener('DOMContentLoaded', function() {
             state: formData.get('state')
         };
 
-        // Try to use backend first, fallback to client-side prediction
-        fetch('/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userInputs)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Backend prediction successful
-                displayResults(data);
-            } else {
-                throw new Error('Backend prediction failed');
-            }
-        })
-        .catch(error => {
-            console.log('Backend not available, using client-side prediction:', error);
+        // Simulate processing time
+        setTimeout(() => {
+            // Make prediction
+            const prediction = predictMentalHealthRisk(userInputs);
             
-            // Fallback to client-side prediction
-            setTimeout(() => {
-                // Make prediction
-                const prediction = predictMentalHealthRisk(userInputs);
-                
-                // Determine condition name
-                let conditionName, conditionDisplay;
-                if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
-                    conditionName = "depression";
-                    conditionDisplay = "depressive disorder";
-                } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
-                    conditionName = "anxiety";
-                    conditionDisplay = "anxiety disorder";
-                } else {
-                    conditionName = "anxiety or depression";
-                    conditionDisplay = "anxiety or depressive disorder";
-                }
+            // Determine condition name
+            let conditionName, conditionDisplay;
+            if (userInputs.indicator.includes("Depressive Disorder") && !userInputs.indicator.includes("Anxiety")) {
+                conditionName = "depression";
+                conditionDisplay = "depressive disorder";
+            } else if (userInputs.indicator.includes("Anxiety Disorder") && !userInputs.indicator.includes("Depressive")) {
+                conditionName = "anxiety";
+                conditionDisplay = "anxiety disorder";
+            } else {
+                conditionName = "anxiety or depression";
+                conditionDisplay = "anxiety or depressive disorder";
+            }
 
-                const resultData = {
-                    prediction: prediction,
-                    confidence: 85, // Mock confidence
-                    recommendation: getRecommendation(prediction, conditionName),
-                    condition_name: conditionName,
-                    condition_display: conditionDisplay,
-                    user_inputs: userInputs
-                };
+            const resultData = {
+                prediction: prediction,
+                confidence: 85, // Mock confidence
+                recommendation: getRecommendation(prediction, conditionName),
+                condition_name: conditionName,
+                condition_display: conditionDisplay,
+                user_inputs: userInputs
+            };
 
-                // Display results
-                displayResults(resultData);
-            }, 1000);
-        })
-        .finally(() => {
+            // Display results
+            displayResults(resultData);
+
             // Reset button
             btnText.textContent = 'Get Assessment';
             btnLoader.style.display = 'none';
             submitBtn.disabled = false;
-        });
+        }, 2000);
     });
 
     // Chatbot functionality for static version
