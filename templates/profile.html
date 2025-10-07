@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Mental Health Assessment Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>👤 User Profile</h1>
+                <p class="subtitle">Manage your account and assessment history</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">← Back to Assessment</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                    <div class="profile-avatar">
+                        {% if user.picture and user.provider == 'google' %}
+                            <img src="{{ user.picture }}" alt="Profile Picture" class="profile-picture">
+                        {% else %}
+                            <span>{{ user.name[0].upper() if user.name else 'U' }}</span>
+                        {% endif %}
+                    </div>
+                        <div class="profile-info">
+                            <h2>{{ user.name or 'User' }}</h2>
+                            <p class="profile-email">{{ user.email or 'No email provided' }}</p>
+                            {% if user.email_verified %}
+                                <span class="verified-badge">✓ Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <h3>Account Information</h3>
+                        <div class="detail-row">
+                            <span class="detail-label">User ID:</span>
+                            <span class="detail-value">{{ user.sub or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Username:</span>
+                            <span class="detail-value">{{ user.preferred_username or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email Verified:</span>
+                            <span class="detail-value">{{ 'Yes' if user.email_verified else 'No' }}</span>
+                        </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Sign-in Method:</span>
+                        <span class="detail-value">
+                            {% if user.provider == 'google' %}
+                                <span class="provider-badge google">🔍 Google</span>
+                            {% elif user.provider == 'github' %}
+                                <span class="provider-badge github">🐙 GitHub</span>
+                            {% elif user.provider == 'email' %}
+                                <span class="provider-badge email">📧 Email</span>
+                            {% elif user.provider == 'ibm' %}
+                                <span class="provider-badge ibm">🔐 IBM Cloud</span>
+                            {% else %}
+                                {{ user.provider or 'Unknown' }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Account Status:</span>
+                        <span class="detail-value">
+                            {% if user.email_verified %}
+                                <span class="status-badge verified">✅ Verified</span>
+                            {% else %}
+                                <span class="status-badge unverified">⚠️ Unverified</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Member Since:</span>
+                        <span class="detail-value">{{ current_date.strftime('%B %Y') if current_date else 'Recently' }}</span>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('home') }}" class="action-btn">
+                            <span class="action-icon">🧠</span>
+                            <span class="action-text">Take Assessment</span>
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="action-btn logout-btn">
+                            <span class="action-icon">🚪</span>
+                            <span class="action-text">Logout</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="profile-info-box">
+                    <h3>🔒 Privacy & Security</h3>
+                    <p>Your mental health assessment data is kept private and secure. We use IBM Cloud App ID for authentication to ensure your personal information is protected according to industry standards.</p>
+                    <ul>
+                        <li>All assessment data is anonymized and used only for providing you with insights</li>
+                        <li>Your login credentials are managed securely through IBM Cloud</li>
+                        <li>You can logout at any time to end your session</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 Mental Health Assessment Tool | Secure & Private</p>
+        </footer>
+    </div>
+
+    <style>
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .profile-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        .profile-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+        }
+
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .verified-badge {
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .profile-details h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+        }
+
+        .profile-actions {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-actions h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+        }
+
+        .action-text {
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        .logout-btn:hover {
+            background: #fee2e2;
+        }
+
+        .profile-info-box {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-info-box h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .profile-info-box p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .profile-info-box ul {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-left: 1.5rem;
+        }
+
+        .profile-info-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        .provider-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .provider-badge.google {
+            background: #f0f9ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .provider-badge.github {
+            background: #f8fafc;
+            color: #24292e;
+            border: 1px solid #e5e7eb;
+        }
+
+        .provider-badge.email {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .provider-badge.ibm {
+            background: #eff6ff;
+            color: #0f62fe;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.verified {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-badge.unverified {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

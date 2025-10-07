@@ -1,0 +1,24 @@
+# IBM Cloud App ID Configuration
+APPID_TENANT_ID=your_tenant_id_here
+APPID_CLIENT_ID=your_client_id_here
+APPID_CLIENT_SECRET=your_client_secret_here
+APPID_DISCOVERY_ENDPOINT=https://us-south.appid.cloud.ibm.com/oauth/v4/your_tenant_id/.well-known/openid_configuration
+APPID_REDIRECT_URI=http://localhost:5000/auth/callback
+
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# Cloudant Database Configuration (Updated)
+CLOUDANT_APIKEY=NMTuUwEMVwYBwBl4qPear_RoenTr6RnvtYIFB-YXgU5J
+CLOUDANT_HOST=a4b042cf-c63f-4df9-acaf-df5ada3d4c7a-bluemix.cloudantnosqldb.appdomain.cloud
+CLOUDANT_USERNAME=a4b042cf-c63f-4df9-acaf-df5ada3d4c7a-bluemix
+CLOUDANT_URL=https://a4b042cf-c63f-4df9-acaf-df5ada3d4c7a-bluemix.cloudantnosqldb.appdomain.cloud
+
+# Flask Configuration
+SECRET_KEY=your-secret-key-here
+FLASK_ENV=development
+
+# IBM Watson Assistant (existing)
+ASSISTANT_IAM_APIKEY=your_watson_api_key_here
+ASSISTANT_URL=your_watson_url_here

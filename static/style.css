@@ -66,7 +66,8 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
-    padding: var(--space-lg);
+    padding: 0;
+    margin: 0;
     font-size: var(--font-size-base);
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
@@ -74,17 +75,19 @@ body {
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
     background: var(--surface);
-    border-radius: var(--radius-2xl);
+    border-radius: 0;
     box-shadow: var(--shadow-xl);
     overflow: hidden;
     border: 1px solid var(--border-light);
+    min-height: 100vh;
 }
 
 header {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--medical-primary), var(--medical-accent));
     color: white;
     padding: var(--space-3xl) var(--space-2xl);
     text-align: center;
@@ -811,9 +814,212 @@ main {
 
 .resources-box li {
     margin-bottom: var(--space-sm);
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-size: var(--font-size-base);
     line-height: 1.5;
+}
+
+.resources-box p {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.resources-box h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: var(--font-size-base);
+}
+
+.resources-box strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.resources-box .intro-text {
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.resources-box .support-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: var(--font-size-base);
+}
+
+.resources-box .support-list {
+    margin-left: var(--space-lg);
+    margin-bottom: 15px;
+}
+
+.resources-box .support-list li {
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+}
+
+.resources-box .clinical-note {
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+
+/* Simple resources box styling */
+.resources-box h3 {
+    color: #7c3aed !important;
+    font-weight: 600;
+}
+
+.resources-box p,
+.resources-box li {
+    color: #374151 !important;
+    line-height: 1.6;
+}
+
+.resources-box strong {
+    color: #1f2937 !important;
+    font-weight: 600;
+}
+
+.resources-box h4 {
+    color: #1e40af !important;
+    font-weight: 600;
+}
+
+/* Professional Medical Results Section Styling */
+.results-section {
+    background: var(--medical-bg-card);
+    border: 1px solid var(--medical-border);
+}
+
+.results-section h2 {
+    color: var(--medical-primary);
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Professional Result Cards */
+.result-card {
+    background: var(--medical-bg-card);
+    border: 1px solid var(--medical-border);
+    border-left: 4px solid var(--medical-primary);
+}
+
+.result-card h3 {
+    color: var(--medical-primary);
+    font-weight: 600;
+}
+
+.result-card p {
+    color: var(--medical-text-secondary);
+    line-height: 1.6;
+}
+
+.result-card strong {
+    color: var(--medical-text-primary);
+    font-weight: 600;
+}
+
+/* Professional Prediction Display */
+.prediction-value {
+    color: var(--medical-primary);
+    font-weight: 700;
+}
+
+/* Professional Risk Badges */
+.risk-badge.low {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--medical-secondary);
+    border: 2px solid rgba(5, 150, 105, 0.3);
+}
+
+.risk-badge.moderate {
+    background: rgba(234, 88, 12, 0.1);
+    color: var(--medical-warning);
+    border: 2px solid rgba(234, 88, 12, 0.3);
+}
+
+.risk-badge.high {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--medical-danger);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+}
+
+/* Professional Profile Cards */
+.user-profile-card {
+    background: var(--medical-bg-card);
+    border: 1px solid var(--medical-border);
+    border-left: 4px solid var(--medical-secondary);
+}
+
+.user-profile-card h3 {
+    color: var(--medical-secondary);
+    font-weight: 600;
+}
+
+.profile-item-label {
+    color: var(--medical-primary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-item-value {
+    color: var(--medical-text-primary);
+    font-weight: 500;
+}
+
+/* Professional Result Info */
+.result-info {
+    background: var(--medical-bg-secondary);
+    border: 1px solid var(--medical-border);
+}
+
+.result-info h3 {
+    color: var(--medical-primary);
+    font-weight: 600;
+}
+
+.result-info p {
+    color: var(--medical-text-secondary);
+    line-height: 1.6;
+}
+
+/* Simple, clean text visibility fixes */
+.results-section h2 {
+    color: #1e40af !important;
+    font-weight: 700;
+}
+
+.results-section h3 {
+    color: #059669 !important;
+    font-weight: 600;
+}
+
+.results-section p {
+    color: #374151 !important;
+}
+
+.results-section li {
+    color: #374151 !important;
+}
+
+.results-section strong {
+    color: #1f2937 !important;
+    font-weight: 600;
 }
 
 footer {
@@ -1325,9 +1531,10 @@ footer p {
 /* Professional Mobile Responsive Design */
 @media (max-width: 768px) {
     .container {
-        border-radius: var(--radius-lg);
+        border-radius: 0;
         max-width: 100%;
-        margin: var(--space-sm);
+        margin: 0;
+        width: 100%;
     }
     
     .header-content h1 {
@@ -1369,7 +1576,8 @@ footer p {
     }
     
     body {
-        padding: var(--space-sm);
+        padding: 0;
+        margin: 0;
     }
     
     .form-group {
@@ -2109,5 +2317,224 @@ footer p {
 .validation-message.success {
     color: var(--success-color);
     display: block;
+}
+
+/* Professional Medical Color Scheme */
+:root {
+    /* Medical Professional Colors */
+    --medical-primary: #2563eb;      /* Professional Blue */
+    --medical-secondary: #059669;    /* Medical Green */
+    --medical-accent: #7c3aed;       /* Trust Purple */
+    --medical-warning: #ea580c;      /* Caution Orange */
+    --medical-danger: #dc2626;       /* Alert Red */
+    
+    /* Medical Text Colors */
+    --medical-text-primary: #1e293b;   /* Dark Blue-Gray */
+    --medical-text-secondary: #475569; /* Medium Blue-Gray */
+    --medical-text-muted: #64748b;     /* Light Blue-Gray */
+    
+    /* Medical Background Colors */
+    --medical-bg-primary: #f8fafc;     /* Clean White */
+    --medical-bg-secondary: #f1f5f9;   /* Light Gray */
+    --medical-bg-card: #ffffff;        /* Pure White */
+    
+    /* Medical Border Colors */
+    --medical-border: #e2e8f0;         /* Light Border */
+    --medical-border-accent: #cbd5e1;  /* Medium Border */
+}
+
+/* Simple fixes for specific invisible text */
+.user-profile-card h3 {
+    color: #059669 !important;
+}
+
+.profile-item-label {
+    color: #1e40af !important;
+}
+
+.profile-item-value {
+    color: #374151 !important;
+}
+
+.prediction-value {
+    color: #1e40af !important;
+    font-weight: 700;
+}
+
+/* Authentication Styles */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.welcome-text {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--font-size-sm);
+}
+
+.btn-login {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-login:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-profile {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-profile:hover {
+    background: var(--bg-tertiary);
+}
+
+.btn-logout {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-logout:hover {
+    background: #b91c1c;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    font-size: var(--font-size-base);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.flash-messages {
+    margin-bottom: 2rem;
+}
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.flash-success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.flash-error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.flash-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.flash-icon {
+    font-size: 1.25rem;
+}
+
+.flash-text {
+    flex: 1;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+.auth-notice {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    text-align: center;
+}
+
+.auth-notice-content h3 {
+    margin-bottom: 1rem;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.auth-notice-content p {
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+/* Mobile responsive for auth components */
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .auth-notice {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-notice-content h3 {
+        font-size: var(--font-size-lg);
+    }
 }
 

@@ -206,20 +206,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <div class="resources-box">
                 <h3>🎯 Next Steps for Early Intervention</h3>
-                <p style="margin-bottom: 15px;">
+                <p class="intro-text">
                     <strong>Early detection is key to better mental health outcomes.</strong> This data-driven assessment helps identify potential risks early, 
                     enabling timely intervention and reducing the burden on healthcare systems.
                 </p>
                 
-                <h4 style="margin-top: 15px; margin-bottom: 10px;">📞 Immediate Support Resources:</h4>
-                <ul>
+                <h4 class="support-title">📞 Immediate Support Resources:</h4>
+                <ul class="support-list">
                     <li><strong>National Suicide Prevention Lifeline:</strong> Call or text 988</li>
                     <li><strong>Crisis Text Line:</strong> Text HOME to 741741</li>
                     <li><strong>SAMHSA National Helpline:</strong> 1-800-662-4357 (24/7 Treatment Referral)</li>
                     <li><strong>NAMI Helpline:</strong> 1-800-950-6264 (Mental Health Support)</li>
                 </ul>
                 
-                <p style="margin-top: 15px; font-size: 0.9rem; padding-top: 15px; border-top: 1px solid #cbd5e1;">
+                <p class="clinical-note">
                     <strong>📋 Clinical Note:</strong> This ML-powered screening tool analyzes population-level patterns to support early detection. 
                     For accurate diagnosis and personalized treatment planning, please consult with a qualified mental health professional who can 
                     conduct a comprehensive clinical evaluation.
