@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Mental Health Assessment Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📊 Admin Dashboard</h1>
+                <p class="subtitle">User Management & Analytics</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">← Back to Assessment</a>
+                <a href="{{ url_for('profile') }}" class="btn btn-profile">👤 Profile</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                <span class="flash-icon">
+                                    {% if category == 'success' %}✅
+                                    {% elif category == 'error' %}❌
+                                    {% elif category == 'info' %}ℹ️
+                                    {% else %}📢
+                                    {% endif %}
+                                </span>
+                                <span class="flash-text">{{ message }}</span>
+                                <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <h3>{{ stats.total_users or 0 }}</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3>{{ stats.verified_emails or 0 }}</h3>
+                        <p>Verified Emails</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-content">
+                        <h3>{{ stats.recent_logins or 0 }}</h3>
+                        <p>Recent Logins (7 days)</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔐</div>
+                    <div class="stat-content">
+                        <h3>{{ stats.providers|length or 0 }}</h3>
+                        <p>Auth Providers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Provider Distribution Chart -->
+            <div class="chart-section">
+                <h2>Authentication Provider Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="providerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Users Table -->
+            <div class="table-section">
+                <h2>Recent Users</h2>
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Provider</th>
+                                <th>Verified</th>
+                                <th>Last Login</th>
+                                <th>Login Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        {% if user.picture %}
+                                            <img src="{{ user.picture }}" alt="Profile" class="user-avatar">
+                                        {% else %}
+                                            <div class="user-avatar-placeholder">{{ user.name[0] if user.name else 'U' }}</div>
+                                        {% endif %}
+                                        <span>{{ user.name or 'Unknown' }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ user.email or 'N/A' }}</td>
+                                <td>
+                                    <span class="provider-badge {{ user.provider or 'unknown' }}">
+                                        {% if user.provider == 'google' %}🔍 Google
+                                        {% elif user.provider == 'github' %}🐙 GitHub
+                                        {% elif user.provider == 'email' %}📧 Email
+                                        {% elif user.provider == 'ibm' %}🔐 IBM Cloud
+                                        {% else %}❓ {{ user.provider or 'Unknown' }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.email_verified %}
+                                        <span class="verified-badge">✓ Verified</span>
+                                    {% else %}
+                                        <span class="unverified-badge">✗ Unverified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.last_login %}
+                                        {{ user.last_login[:10] }}
+                                    {% else %}
+                                        Never
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.login_count or 0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Database Status -->
+            <div class="status-section">
+                <h2>Database Status</h2>
+                <div class="status-card">
+                    <div class="status-item">
+                        <span class="status-label">Cloudant Connection:</span>
+                        <span class="status-value success">✅ Connected</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Database Name:</span>
+                        <span class="status-value">mental_health_users</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Last Updated:</span>
+                        <span class="status-value">{{ current_date.strftime('%Y-%m-%d %H:%M:%S') if current_date else 'Just now' }}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 Mental Health Assessment Tool | Admin Dashboard</p>
+        </footer>
+    </div>
+
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-content h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-content p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .chart-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .table-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .users-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .users-table td {
+            color: var(--text-secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .provider-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .provider-badge.google {
+            background: #f0f9ff;
+            color: #1d4ed8;
+        }
+
+        .provider-badge.github {
+            background: #f8fafc;
+            color: #24292e;
+        }
+
+        .provider-badge.email {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .provider-badge.ibm {
+            background: #eff6ff;
+            color: #0f62fe;
+        }
+
+        .verified-badge {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .unverified-badge {
+            color: #dc2626;
+            font-weight: 500;
+        }
+
+        .status-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .status-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .status-value {
+            color: var(--text-secondary);
+        }
+
+        .status-value.success {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .users-table {
+                font-size: 0.875rem;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        // Provider distribution chart
+        const providerData = {{ stats.providers|tojson }};
+        const ctx = document.getElementById('providerChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(providerData),
+                datasets: [{
+                    data: Object.values(providerData),
+                    backgroundColor: [
+                        '#4285f4', // Google blue
+                        '#24292e', // GitHub dark
+                        '#667eea', // Email purple
+                        '#0f62fe'  // IBM blue
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
